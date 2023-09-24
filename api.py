@@ -79,9 +79,14 @@ CORS(app)
 class status(Resource):    
      def get(self):
          return {"hello": "world"}
+     
+class other_route(Resource):
+    def get(self):
+        return {"trial": "dos"}
          
 
 api.add_resource(status, '/')
+api.add_resource(other_route, '/other')
 # api.add_resource(FinanceTags, '/<ticker>')
 # api.add_resource(TagsByYear, '/<ticker>/<year>')
 
