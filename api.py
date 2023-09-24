@@ -69,8 +69,12 @@ class TagsByYear(Resource):
         db_connection = DataBase()
         request_in_json = db_connection.getTagsByYear(ticker, year)
         return request_in_json
+    
+class TestPage(Resource):
+    def testP(self):
+        return "test home page."
 
-
+api.add_resource(TestPage)
 api.add_resource(FinanceTags, '/<ticker>')
 api.add_resource(TagsByYear, '/<ticker>/<year>')
 
