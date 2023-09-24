@@ -73,18 +73,10 @@ api = Api(app)
     
 class status(Resource):    
      def get(self):
-         try:
-            return {'data': 'Api running'}
-         except: 
-            return {'data': "1"}
-         
-class Sum(Resource):
-    def get(self, a, b):
-        return jsonify({'data': a+b})
+         return {"hello": "world"}
          
 
 api.add_resource(status, '/')
-api.add_resource(Sum, '/add/<int:a>,<int:b>')
 # api.add_resource(FinanceTags, '/<ticker>')
 # api.add_resource(TagsByYear, '/<ticker>/<year>')
 
