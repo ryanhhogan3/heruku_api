@@ -71,10 +71,10 @@ class TagsByYear(Resource):
         return request_in_json
     
 class TestPage(Resource):
-    def testP(self):
+    def get(self):
         return "test home page."
 
-api.add_resource(TestPage)
+api.add_resource(TestPage, '/')
 api.add_resource(FinanceTags, '/<ticker>')
 api.add_resource(TagsByYear, '/<ticker>/<year>')
 
