@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return {"test":"test1"}
 
 # @app.route("/json")
 # def get_json():
