@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
 import pandas as pd
-import pymongo
+# import pymongo
 
 ## PUSH 
 # git push heroku main
