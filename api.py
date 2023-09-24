@@ -9,12 +9,18 @@
 # api = Api(app)
 
 from flask import Flask
+import pandas as pd
+
 
 app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+@app.route("/json")
+def get_json():
+    return {"test":"test1"}
 
 # # CLASS OBJECT TO HANDLE METHODS OF READING DATA FROM PYMONGO
 # class DataBase():
