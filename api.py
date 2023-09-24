@@ -18,6 +18,10 @@ app = Flask(__name__)
 def hello_world():
     return {"test":"test1"}
 
+@app.route("/json")
+def other_route():
+    return {"test2":"tst2"}
+
 # @app.route("/json")
 # def get_json():
 #     return {"test":"test1"}
