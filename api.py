@@ -92,5 +92,5 @@ def get_json():
 # api.add_resource(TagsByYear, '/<ticker>/<year>')
 
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
