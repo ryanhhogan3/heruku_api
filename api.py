@@ -18,9 +18,9 @@ app = Flask(__name__)
 def hello_world():
     return "<p>Hello, World!</p>"
 
-@app.route("/json")
-def get_json():
-    return {"test":"test1"}
+# @app.route("/json")
+# def get_json():
+#     return {"test":"test1"}
 
 # # CLASS OBJECT TO HANDLE METHODS OF READING DATA FROM PYMONGO
 # class DataBase():
