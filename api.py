@@ -1,6 +1,10 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
-import pandas as pd
+from flask_cors import CORS
+
+
+
+# import pandas as pd
 # import pymongo
 
 ## PUSH 
@@ -9,6 +13,7 @@ import pandas as pd
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 # CLASS OBJECT TO HANDLE METHODS OF READING DATA FROM PYMONGO
 # class DataBase():
@@ -82,4 +87,4 @@ api.add_resource(status, '/')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
