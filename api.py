@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
+import yfinance as yf
 
 
 
@@ -83,10 +84,17 @@ class status(Resource):
 class other_route(Resource):
     def get(self):
         return {"trial": "dos"}
+    
+class Stock(Resource):
+    def get(self, ticker):
+        stock = yf.Ticker(ticker)
+        history = stock.history("1y")['Close']
+        return jsonify(history)
+        
          
 
 api.add_resource(status, '/')
-
+api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(FinanceTags, '/<ticker>')
 api.add_resource(TagsByYear, '/<ticker>/<year>')
 
