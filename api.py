@@ -5,8 +5,8 @@ import yfinance as yf
 
 
 
-import pandas as pd
-import pymongo
+# import pandas as pd
+# import pymongo
 
 ## PUSH 
 # git push heroku main
