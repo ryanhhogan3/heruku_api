@@ -92,11 +92,28 @@ class status(Resource):
 class other_route(Resource):
     def get(self):
         return {"trial": "dos"}
+    
+class TreasuryData(Resource):
+    def get(self):
+        link = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?field_tdr_date_value=2023&type=daily_treasury_yield_curve&page&_format=csv'
+    
+        yeilds = pd.read_csv(link)
+
+        treasuryDF = yeilds.T
+
+        treasuryDF = treasuryDF.rename(columns=yeilds['Date'])
+
+        treasuryDF = treasuryDF.drop(['Date'])
+
+        json_data = treasuryDF.to_dict(orient='records')
+
+        return jsonify(json_data)
          
 
 api.add_resource(status, '/')
 api.add_resource(other_route, '/other')
 api.add_resource(Stock, '/Stock/<ticker>')
+api.add_resource(TreasuryData, '/treasuries')
 # api.add_resource(FinanceTags, '/<ticker>')
 # api.add_resource(TagsByYear, '/<ticker>/<year>')
 
