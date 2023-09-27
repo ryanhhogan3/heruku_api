@@ -105,9 +105,9 @@ class TreasuryData(Resource):
 
         treasuryDF = treasuryDF.drop(['Date'])
 
-        json_data = treasuryDF.to_dict(orient='records')
+        # json_data = treasuryDF.to_dict(orient='records')
 
-        return jsonify(json_data)
+        return jsonify(treasuryDF)
          
 
 api.add_resource(status, '/')
