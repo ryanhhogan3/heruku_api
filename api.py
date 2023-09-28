@@ -103,11 +103,15 @@ class TreasuryData(Resource):
 
         treasuryDF = treasuryDF.rename(columns=yeilds['Date'])
 
+
         treasuryDF = treasuryDF.drop(['Date'])
+        print(treasuryDF)
 
-        # json_data = treasuryDF.to_dict(orient='records')
+        treasuryDF = treasuryDF.T
 
-        return jsonify(treasuryDF)
+        json_data = treasuryDF.to_dict(orient='index')
+
+        return jsonify(json_data)
          
 
 api.add_resource(status, '/')
