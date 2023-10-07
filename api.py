@@ -4,6 +4,93 @@ from flask_cors import CORS
 import yfinance as yf
 import pandas as pd
 
+app = Flask(__name__)
+api = Api(app)
+CORS(app)
+
+###################################
+########## CLASS OBJECTS ##########
+###################################
+
+class Equity:
+    def __init__(self, ticker):
+        self.ticker = ticker
+
+    def ytdReturn(self):
+        stock = yf.Ticker(self.ticker)
+        ytdData = pd.DataFrame(stock.history('ytd')['Close'])
+        latestClose = ytdData.Close.iloc[-1]
+        startClose = ytdData.Close.iloc[0]
+        print(latestClose)
+        print(startClose)
+        ytdReturn = (latestClose/startClose-1)
+        return ytdReturn
+    
+
+
+###################################
+########## API CLASSES ############
+###################################
+
+class YTDreturn(Resource):
+    def get(self, ticker):
+        ytdreturn = Equity(ticker).ytdReturn()
+        return ytdreturn
+
+
+
+
+class Stock(Resource):
+    def get(self, ticker):
+
+        stock = yf.Ticker(ticker)
+        history = pd.DataFrame(stock.history("1y")['Close'])
+        json_data = history.to_dict(orient='records')
+        return jsonify(json_data)
+    
+class status(Resource):    
+     def get(self):
+         return {"hello": "world"}
+     
+class other_route(Resource):
+    def get(self):
+        return {"trial": "dos"}
+    
+class TreasuryData(Resource):
+    def get(self):
+        link = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?field_tdr_date_value=2023&type=daily_treasury_yield_curve&page&_format=csv'
+    
+        yeilds = pd.read_csv(link)
+
+        treasuryDF = yeilds.T
+
+        treasuryDF = treasuryDF.rename(columns=yeilds['Date'])
+
+
+        treasuryDF = treasuryDF.drop(['Date'])
+
+        treasuryDF = treasuryDF.T
+
+        json_data = treasuryDF.to_dict(orient='index')
+
+        return jsonify(json_data)
+
+
+
+
+###################################
+########## API ENDPOINTS ##########
+###################################
+api.add_resource(status, '/')
+api.add_resource(YTDreturn, '/Stock/<ticker>/ytdreturn')
+api.add_resource(other_route, '/other')
+api.add_resource(Stock, '/Stock/<ticker>')
+api.add_resource(TreasuryData, '/treasuries')
+
+
+if __name__ == '__main__':
+    app.run()
+
 
 
 # import pandas as pd
@@ -11,11 +98,14 @@ import pandas as pd
 
 ## PUSH 
 # git push heroku main
+# api.add_resource(FinanceTags, '/<ticker>')
+# api.add_resource(TagsByYear, '/<ticker>/<year>')
 
 
-app = Flask(__name__)
-api = Api(app)
-CORS(app)
+
+
+
+
 
 # CLASS OBJECT TO HANDLE METHODS OF READING DATA FROM PYMONGO
 # class DataBase():
@@ -77,50 +167,3 @@ CORS(app)
 #         db_connection = DataBase()
 #         request_in_json = db_connection.getTagsByYear(ticker, year)
 #         return request_in_json
-
-class Stock(Resource):
-    def get(self, ticker):
-        stock = yf.Ticker(ticker)
-        history = pd.DataFrame(stock.history("1y")['Close'])
-        json_data = history.to_dict(orient='records')
-        return jsonify(json_data)
-    
-class status(Resource):    
-     def get(self):
-         return {"hello": "world"}
-     
-class other_route(Resource):
-    def get(self):
-        return {"trial": "dos"}
-    
-class TreasuryData(Resource):
-    def get(self):
-        link = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?field_tdr_date_value=2023&type=daily_treasury_yield_curve&page&_format=csv'
-    
-        yeilds = pd.read_csv(link)
-
-        treasuryDF = yeilds.T
-
-        treasuryDF = treasuryDF.rename(columns=yeilds['Date'])
-
-
-        treasuryDF = treasuryDF.drop(['Date'])
-        print(treasuryDF)
-
-        treasuryDF = treasuryDF.T
-
-        json_data = treasuryDF.to_dict(orient='index')
-
-        return jsonify(json_data)
-         
-
-api.add_resource(status, '/')
-api.add_resource(other_route, '/other')
-api.add_resource(Stock, '/Stock/<ticker>')
-api.add_resource(TreasuryData, '/treasuries')
-# api.add_resource(FinanceTags, '/<ticker>')
-# api.add_resource(TagsByYear, '/<ticker>/<year>')
-
-
-if __name__ == '__main__':
-    app.run()
