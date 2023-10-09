@@ -101,7 +101,6 @@ class TreasuryData(Resource):
 
 
 
-
 ###################################
 ########## API ENDPOINTS ##########
 ###################################
@@ -110,19 +109,18 @@ api.add_resource(status, '/')
 api.add_resource(YTDreturn, '/Stock/<ticker>/ytdreturn')
 api.add_resource(threeYearReturn, '/Stock/<ticker>/3Yreturn')
 api.add_resource(fiveYearReturn, '/Stock/<ticker>/5Yreturn')
-
 api.add_resource(dividends, '/Stock/<ticker>/dividends')
-
-
-
 api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(TreasuryData, '/treasuries')
 
 
+
+#####################################
+########## SERVER SETTINGS ##########
+#####################################
+
 if __name__ == '__main__':
     app.run()
-
-
 
 # import pandas as pd
 # import pymongo
