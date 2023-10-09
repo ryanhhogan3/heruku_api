@@ -44,7 +44,6 @@ class Equity:
         stock = yf.Ticker(self.ticker)
         dividends = pd.DataFrame(stock.dividends)
         dividends = pd.DataFrame(dividends['Dividends'])
-        print(dividends)
         return dividends
 
 
@@ -70,7 +69,8 @@ class fiveYearReturn(Resource):
 class dividends(Resource):
     def get(self, ticker):
         dividends = Equity(ticker).dividendHistory()
-        dividendsJson = dividends.to_dict(orient='records')
+        dividends.index = dividends.index.strftime("%m/%d/%Y")
+        dividendsJson = dividends.to_dict(orient='index')
         return dividendsJson
 
 
@@ -87,10 +87,6 @@ class Stock(Resource):
 class status(Resource):    
     def get(self):
         return {"hello": "world"}
-    
-class other_route(Resource):
-    def get(self):
-        return {"trial": "dos"}
     
 class TreasuryData(Resource):
     def get(self):
@@ -118,7 +114,7 @@ api.add_resource(fiveYearReturn, '/Stock/<ticker>/5Yreturn')
 api.add_resource(dividends, '/Stock/<ticker>/dividends')
 
 
-api.add_resource(other_route, '/other')
+
 api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(TreasuryData, '/treasuries')
 
