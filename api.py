@@ -18,13 +18,36 @@ class Equity:
 
     def ytdReturn(self):
         stock = yf.Ticker(self.ticker)
-        ytdData = pd.DataFrame(stock.history('ytd')['Close'])
-        latestClose = ytdData.Close.iloc[-1]
-        startClose = ytdData.Close.iloc[0]
-        print(latestClose)
-        print(startClose)
+        closeData = pd.DataFrame(stock.history('ytd')['Close'])
+        latestClose = closeData.Close.iloc[-1]
+        startClose = closeData.Close.iloc[0]
         ytdReturn = (latestClose/startClose-1)
         return ytdReturn
+    
+    def threeYearReturn(self):
+        stock = yf.Ticker(self.ticker)
+        closeData = pd.DataFrame(stock.history('3y')['Close'])
+        latestClose = closeData.Close.iloc[-1]
+        startClose = closeData.Close.iloc[0]
+        threeYearReturn = (latestClose/startClose-1)
+        return threeYearReturn
+    
+    def fiveYearReturn(self):
+        stock = yf.Ticker(self.ticker)
+        closeData = pd.DataFrame(stock.history('5y')['Close'])
+        latestClose = closeData.Close.iloc[-1]
+        startClose = closeData.Close.iloc[0]
+        fiveYearReturn = (latestClose/startClose-1)
+        return fiveYearReturn
+    
+    def dividendHistory(self):
+        stock = yf.Ticker(self.ticker)
+        dividends = pd.DataFrame(stock.dividends)
+        return dividends['Dividends']
+    
+
+    
+
     
 
 
@@ -37,8 +60,23 @@ class YTDreturn(Resource):
         ytdreturn = Equity(ticker).ytdReturn()
         return ytdreturn
 
+class threeYearReturn(Resource):
+    def get(self, ticker):
+        threeYReturn = Equity(ticker).threeYearReturn()
+        return threeYReturn 
+
+class fiveYearReturn(Resource):
+    def get(self, ticker):
+        fiveYReturn = Equity(ticker).fiveYearReturn()
+        return fiveYReturn 
+    
+class dividends(Resource):
+    def get(self, ticker):
+        dividends = Equity(ticker).dividendHistory()
+        return jsonify(dividends)
 
 
+#############
 
 class Stock(Resource):
     def get(self, ticker):
@@ -49,9 +87,9 @@ class Stock(Resource):
         return jsonify(json_data)
     
 class status(Resource):    
-     def get(self):
-         return {"hello": "world"}
-     
+    def get(self):
+        return {"hello": "world"}
+    
 class other_route(Resource):
     def get(self):
         return {"trial": "dos"}
@@ -59,20 +97,12 @@ class other_route(Resource):
 class TreasuryData(Resource):
     def get(self):
         link = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?field_tdr_date_value=2023&type=daily_treasury_yield_curve&page&_format=csv'
-    
         yeilds = pd.read_csv(link)
-
         treasuryDF = yeilds.T
-
         treasuryDF = treasuryDF.rename(columns=yeilds['Date'])
-
-
         treasuryDF = treasuryDF.drop(['Date'])
-
         treasuryDF = treasuryDF.T
-
         json_data = treasuryDF.to_dict(orient='index')
-
         return jsonify(json_data)
 
 
@@ -81,8 +111,15 @@ class TreasuryData(Resource):
 ###################################
 ########## API ENDPOINTS ##########
 ###################################
+
 api.add_resource(status, '/')
 api.add_resource(YTDreturn, '/Stock/<ticker>/ytdreturn')
+api.add_resource(threeYearReturn, '/Stock/<ticker>/3Yreturn')
+api.add_resource(fiveYearReturn, '/Stock/<ticker>/5Yreturn')
+
+api.add_resource(dividends, '/Stock/<ticker>/dividends')
+
+
 api.add_resource(other_route, '/other')
 api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(TreasuryData, '/treasuries')
