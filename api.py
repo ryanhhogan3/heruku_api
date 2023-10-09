@@ -43,12 +43,9 @@ class Equity:
     def dividendHistory(self):
         stock = yf.Ticker(self.ticker)
         dividends = pd.DataFrame(stock.dividends)
-        return dividends['Dividends']
-    
-
-    
-
-    
+        dividends = pd.DataFrame(dividends['Dividends'])
+        print(dividends)
+        return dividends
 
 
 ###################################
@@ -73,7 +70,8 @@ class fiveYearReturn(Resource):
 class dividends(Resource):
     def get(self, ticker):
         dividends = Equity(ticker).dividendHistory()
-        return jsonify(dividends)
+        dividendsJson = dividends.to_dict(orient='records')
+        return dividendsJson
 
 
 #############
