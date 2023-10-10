@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 from flask_cors import CORS
 import yfinance as yf
 import pandas as pd
+from functools import lru_cache
 
 app = Flask(__name__)
 api = Api(app)
@@ -15,6 +16,14 @@ CORS(app)
 class Equity:
     def __init__(self, ticker):
         self.ticker = ticker
+
+    @lru_cache(maxsize=32)
+    def getCurrentPrice(self):
+        stock = yf.Ticker(self.ticker)
+        closeData = pd.DataFrame(stock.history('ytd')['Close'])
+        latestClose = closeData.Close.iloc[-1]
+        return latestClose
+
 
     def ytdReturn(self):
         stock = yf.Ticker(self.ticker)
@@ -72,6 +81,11 @@ class dividends(Resource):
         dividends.index = dividends.index.strftime("%m/%d/%Y")
         dividendsJson = dividends.to_dict(orient='index')
         return dividendsJson
+    
+class latestPrice(Resource):
+    def get(self, ticker):
+        latestClosePrice = Equity(ticker).getCurrentPrice()
+        return latestClosePrice
 
 
 #############
@@ -106,10 +120,14 @@ class TreasuryData(Resource):
 ###################################
 
 api.add_resource(status, '/')
+
 api.add_resource(YTDreturn, '/Stock/<ticker>/ytdreturn')
 api.add_resource(threeYearReturn, '/Stock/<ticker>/3Yreturn')
 api.add_resource(fiveYearReturn, '/Stock/<ticker>/5Yreturn')
 api.add_resource(dividends, '/Stock/<ticker>/dividends')
+api.add_resource(latestPrice, '/Stock/<ticker>/currentPrice')
+
+
 api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(TreasuryData, '/treasuries')
 
