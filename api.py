@@ -51,9 +51,16 @@ class Equity:
     
     def dividendHistory(self):
         stock = yf.Ticker(self.ticker)
+        # NO TIME FRAME SET ... USE .HISTORY()
         dividends = pd.DataFrame(stock.dividends)
         dividends = pd.DataFrame(dividends['Dividends'])
         return dividends
+    
+    def getvolumeOneYear(self):
+        stock = yf.Ticker(self.ticker).history('1y')
+        volumedata = pd.DataFrame(stock.Volume)
+        volumedata = pd.DataFrame(volumedata['Volume'])
+        return volumedata
 
 
 ###################################
@@ -86,6 +93,14 @@ class latestPrice(Resource):
     def get(self, ticker):
         latestClosePrice = Equity(ticker).getCurrentPrice()
         return latestClosePrice
+    
+class volumeOneYear(Resource):
+    def get(self, ticker):
+        volumeData = Equity(ticker).getvolumeOneYear()
+        volumeData.index = volumeData.index.strftime("%m/%d/%Y")
+        volumeDataJson = volumeData.to_dict(orient='index')
+        return volumeDataJson
+
 
 
 #############
@@ -101,8 +116,7 @@ class Stock(Resource):
 class status(Resource):    
     def get(self):
         return {"hello": "world"}
-    
-@lru_cache(maxsize=32)
+
 class TreasuryData(Resource):
     def get(self):
         link = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?field_tdr_date_value=2023&type=daily_treasury_yield_curve&page&_format=csv'
@@ -127,7 +141,7 @@ api.add_resource(threeYearReturn, '/Stock/<ticker>/3Yreturn')
 api.add_resource(fiveYearReturn, '/Stock/<ticker>/5Yreturn')
 api.add_resource(dividends, '/Stock/<ticker>/dividends')
 api.add_resource(latestPrice, '/Stock/<ticker>/currentPrice')
-
+api.add_resource(volumeOneYear, '/Stock/<ticker>/1Yvolumedata')
 
 api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(TreasuryData, '/treasuries')
