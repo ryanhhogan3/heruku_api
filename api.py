@@ -141,7 +141,7 @@ api.add_resource(threeYearReturn, '/Stock/<ticker>/3Yreturn')
 api.add_resource(fiveYearReturn, '/Stock/<ticker>/5Yreturn')
 api.add_resource(dividends, '/Stock/<ticker>/dividends')
 api.add_resource(latestPrice, '/Stock/<ticker>/currentPrice')
-api.add_resource(volumeOneYear, '/Stock/<ticker>/1Yvolumedata')
+api.add_resource(volumeOneYear, '/Stock/<ticker>/volume/1y')
 
 api.add_resource(Stock, '/Stock/<ticker>')
 api.add_resource(TreasuryData, '/treasuries')
