@@ -102,6 +102,7 @@ class status(Resource):
     def get(self):
         return {"hello": "world"}
     
+@lru_cache(maxsize=32)
 class TreasuryData(Resource):
     def get(self):
         link = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?field_tdr_date_value=2023&type=daily_treasury_yield_curve&page&_format=csv'
