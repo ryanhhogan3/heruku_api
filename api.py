@@ -22,7 +22,7 @@ class Equity:
     def getCurrentPrice(self):
         stock = yf.Ticker(self.ticker)
         closeData = pd.DataFrame(stock.history('ytd')['Close'])
-        latestClose = closeData.Close.iloc[-1]
+        latestClose = round(closeData.Close.iloc[-1],2)
         time.sleep(1)
         return latestClose
 
