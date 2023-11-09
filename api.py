@@ -4,6 +4,7 @@ from flask_cors import CORS
 import yfinance as yf
 import pandas as pd
 from functools import lru_cache
+import time
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,6 +23,7 @@ class Equity:
         stock = yf.Ticker(self.ticker)
         closeData = pd.DataFrame(stock.history('ytd')['Close'])
         latestClose = closeData.Close.iloc[-1]
+        time.sleep(1)
         return latestClose
 
 
@@ -31,6 +33,7 @@ class Equity:
         latestClose = closeData.Close.iloc[-1]
         startClose = closeData.Close.iloc[0]
         ytdReturn = (latestClose/startClose-1)
+        time.sleep(1)
         return ytdReturn
     
     def threeYearReturn(self):
