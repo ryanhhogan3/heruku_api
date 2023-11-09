@@ -33,8 +33,9 @@ class Equity:
         latestClose = closeData.Close.iloc[-1]
         startClose = closeData.Close.iloc[0]
         ytdReturn = (latestClose/startClose-1)
+        ytdReturn = round(ytdReturn,4)
         time.sleep(1)
-        return ytdReturn
+        return ytdReturn * 100
     
     def threeYearReturn(self):
         stock = yf.Ticker(self.ticker)
