@@ -10,9 +10,14 @@ import requests
 # SET HEADERS FOR SEC REQUESTS
 headers = {'User-Agent': 'ben@gmail.com'}
 
+# SET PANDAS SCIENTIFIC NOTATION
+pd.set_option('display.float_format', lambda x: '%.3f' % x)
+
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+
+
 
 #######################################################################################################################################
 ############################################################ EQUITY OBJECT FUNCTIONS ##################################################
@@ -246,7 +251,7 @@ class CapitalExpenditureAnnual(Resource):
         return CapexAnnual
     
 
-###### help!!! ####
+
 class FreeCashFlowAnnual(Resource):
     def get(self, ticker):
         cfotag = "NetCashProvidedByUsedInOperatingActivities"
@@ -254,10 +259,15 @@ class FreeCashFlowAnnual(Resource):
         capextag = "PaymentsToAcquirePropertyPlantAndEquipment"
         CapexAnnual = Equity(ticker).getAnnualValuesOfTag(capextag)
 
-        ## NEEDS WORK DUE TO DIFFERENCE IN LENGTH OF BOTH COLUMNS
-        FreeCashFlows = CfoAnnual['val'] - CapexAnnual['val']
+        FreeCashFlows = CfoAnnual.set_index('frame').join(CapexAnnual.set_index('frame'), lsuffix='_OpCashFlowAnnual')
+        FreeCashFlows['FreeCashFlow'] = FreeCashFlows['val_OpCashFlowAnnual'] - FreeCashFlows['val']
+
+        FreeCashFlows = FreeCashFlows.drop(columns=['start_OpCashFlowAnnual','end_OpCashFlowAnnual', 'accn_OpCashFlowAnnual', 'fy_OpCashFlowAnnual','fp_OpCashFlowAnnual','form_OpCashFlowAnnual','accn','val_OpCashFlowAnnual','val'])
+        FreeCashFlows = FreeCashFlows.dropna()
+        
+        FreeCashFlowsJson = FreeCashFlows.to_dict(orient='index')
         print(FreeCashFlows)
-        return 1
+        return FreeCashFlowsJson
 
 
 
