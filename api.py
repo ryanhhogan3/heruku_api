@@ -101,6 +101,8 @@ class Equity:
         valueOfTag = valueOfTag.sort_values("end")
         return valueOfTag
 
+
+# FOR THIS FUNCTION AND API IN GENERAL WE NEED TO SPECIFY THE STANDARD API OUT PUT SHOULD LOOK LIKE
     def getAnnualValuesOfTag(self, tag):
         valuesDF = self.getValueOfTag(tag)
         
@@ -169,6 +171,12 @@ class Equity:
         volumedata = pd.DataFrame(stock.Volume)
         volumedata = pd.DataFrame(volumedata['Volume'])
         return volumedata
+    
+    def getCloseHistory(self, timeframe):
+        stock = yf.Ticker(self.ticker).history(timeframe)
+        closeData = pd.DataFrame(stock.Volume)
+        closeData = pd.DataFrame(closeData['Close'])
+        return closeData
 
 
 ###################################################################################################################
@@ -179,6 +187,12 @@ class Equity:
 # THIS IS BECAUSE WE MIGHT NEED TO USE THE FUNCTIONS ELSE WHERE ESPECIALLY WHEN MAKING COMPARISIONS/CALCULATIONS
 
 ########## PRICING DATA CLASSES ##########
+
+class oneYearCloseData(Resource):
+    def get(self, ticker):
+        oneYcloseData = Equity(ticker).getCloseHistory('1y')
+        oneYearCloseDataJson = oneYcloseData.to_dict(orient='index')
+        return oneYearCloseDataJson
 
 class YTDreturn(Resource):
     def get(self, ticker):
@@ -232,10 +246,23 @@ class tickerName(Resource):
 
 ########## FINANCIAL STATEMENT CLASSES ##########
 
+class DilutedSharesOutstandingAnnual(Resource):
+    def get(self, ticker):
+        tag = 'WeightedAverageNumberOfDilutedSharesOutstanding'
+        sharesAnnual = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
+        return sharesAnnual
+
+class RevenueAnnual(Resource):
+    def get(self, ticker):
+        tag = 'RevenueFromContractWithCustomerExcludingAssessedTax'
+        revAnnual = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
+        return revAnnual
+
+
 class netIncomeLossAnnual(Resource):
     def get(self, ticker):
         tag = "NetIncomeLoss"
-        netIandL = Equity(ticker).getAnnualValuesOfTag(tag)
+        netIandL = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
         return netIandL
 
 class OpertatingCashflowsAnnual(Resource):
@@ -275,7 +302,6 @@ class FreeCashFlowAnnual(Resource):
 
 class Stock(Resource):
     def get(self, ticker):
-
         stock = yf.Ticker(ticker)
         history = pd.DataFrame(stock.history("1y")['Close'])
         json_data = history.to_dict(orient='records')
@@ -314,6 +340,7 @@ api.add_resource(dividends, '/Stock/<ticker>/dividends')
 
 # EQUITY PRICE ENDPOINTS
 api.add_resource(latestPrice, '/Stock/<ticker>/currentPrice')
+api.add_resource(oneYearCloseData, '/Stock/<ticker>/price/1y')
 
 # EQUTIY VOLUME ENDPOINTS
 api.add_resource(volumeOneYear, '/Stock/<ticker>/volume/1y')
@@ -324,10 +351,13 @@ api.add_resource(tickerCIK, '/Stock/<ticker>/ciknumber')
 api.add_resource(tickerName, '/Stock/<ticker>/cikname')
 
 # EQUITY FINANCIALS ENDPOINTS
+# ANNUAL DATA
 api.add_resource(netIncomeLossAnnual, '/Stock/<ticker>/annual/netincomeloss')
 api.add_resource(OpertatingCashflowsAnnual, '/Stock/<ticker>/annual/operatingcashflows')
 api.add_resource(CapitalExpenditureAnnual, '/Stock/<ticker>/annual/capex')
 api.add_resource(FreeCashFlowAnnual, '/Stock/<ticker>/annual/freecashflow')
+api.add_resource(RevenueAnnual, '/Stock/<ticker>/annual/revenue')
+api.add_resource(DilutedSharesOutstandingAnnual, '/Stock/<ticker>/annual/shares')
 
 
 
