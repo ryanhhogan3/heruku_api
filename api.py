@@ -174,7 +174,7 @@ class Equity:
     
     def getCloseHistory(self, timeframe):
         stock = yf.Ticker(self.ticker).history(timeframe)
-        closeData = pd.DataFrame(stock.Volume)
+        closeData = pd.DataFrame(stock.Close)
         closeData = pd.DataFrame(closeData['Close'])
         return closeData
 
@@ -191,6 +191,7 @@ class Equity:
 class oneYearCloseData(Resource):
     def get(self, ticker):
         oneYcloseData = Equity(ticker).getCloseHistory('1y')
+        oneYcloseData.index = oneYcloseData.index.strftime("%m/%d/%Y")
         oneYearCloseDataJson = oneYcloseData.to_dict(orient='index')
         return oneYearCloseDataJson
 
