@@ -92,6 +92,7 @@ class Equity:
 
     # RETURNS THE VALUE OF A TAG IN DATAFRAME FORMAT FOR TICKER
     def getValueOfTag(self, tag):
+        # GET THE CIK NUMBER OF THE TICKER PARAMETER
         CIKOfTicker = self.getTickerCIK()
         response = requests.get(f"https://data.sec.gov/api/xbrl/companyconcept/CIK{CIKOfTicker}/us-gaap/{tag}.json", headers=headers)
         lowerLvlDictKey = response.json()['units'].keys()
@@ -107,15 +108,11 @@ class Equity:
         valuesDF = self.getValueOfTag(tag)
         
         valuesDF = valuesDF.drop(columns='filed')
-        # valuesDF = valuesDF.drop(columns='accn')
-        # valuesDF = valuesDF.drop(columns='form')
-        # valuesDF = valuesDF.drop(columns='start')
-        # valuesDF = valuesDF.drop(columns='end')
-        # valuesDF = valuesDF.drop(columns='fy')
-        # # valuesDF = valuesDF.drop(columns='fp')
-        # valuesDF = valuesDF.drop(columns='frame')
+        
+
         valuesDFannualFilter = valuesDF.where(~valuesDF['fp'].str.contains("Q")).dropna(how='all')
-        valuesDFannualFilter = valuesDFannualFilter.where(~valuesDFannualFilter['frame'].str.contains("Q", na=False)).dropna()
+        valuesDFannualFilter = valuesDFannualFilter.where(~valuesDFannualFilter['frame'].str.contains("Q", na=False)).dropna(how='any')
+        valuesDFannualFilter = valuesDFannualFilter.drop(columns=['accn','form','start','end']).set_index('frame')
         print(valuesDFannualFilter)
         # valuesJSON = valuesDFannualFilter.to_dict(orient='index')
         return valuesDFannualFilter
