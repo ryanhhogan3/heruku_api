@@ -174,6 +174,81 @@ class Equity:
         closeData = pd.DataFrame(stock.Close)
         closeData = pd.DataFrame(closeData['Close'])
         return closeData
+    
+    def fiveYearReturnsByMonthTable(self):
+        # Gets the historical close prices by input time frame
+        def getHistoricalClosePrices(ticker, time):
+            stockObj = yf.Ticker(ticker).history(time)
+            return stockObj
+        # Gets the returns from dataframe from date: 'start' to 'end'
+        def getReturnForMonth(df, start, end):
+            start = start.date()
+            end = end.date()
+            returnForMon = df.loc[start:end]['Returns'].sum()
+            return returnForMon
+        
+        sample_data = getHistoricalClosePrices(self.ticker, '5y')
+        sample_data.index = sample_data.index.date
+        sample_data['Returns'] = sample_data['Close'].pct_change(1)
+        close_returns_df = sample_data
+        # listOfDates = close_returns_df.index
+        # currentYear = dt.datetime.today().year
+        # print(currentYear)
+        start = pd.Timestamp(year=2019, month=1, day=1)
+        df = pd.DataFrame({"Start": pd.date_range(start, periods=60, freq="MS"),
+                            "End": pd.date_range(start, periods=60, freq="M")})
+
+
+        df['Returns'] = 1
+        for k in df.index:
+            # print(df['Start'][k].date(), df['End'][k].date())
+            try:
+                
+                df['Returns'][k] = getReturnForMonth(sample_data, df['Start'][k], df['End'][k])
+            except:
+                df['Returns'][k] = 0
+        df['Start'] = (df['Start']).apply(lambda s: s.strftime('%m-%d-%Y') if pd.notnull(s) else s)
+        df['End'] = (df['End']).apply(lambda s: s.strftime('%m-%d-%Y') if pd.notnull(s) else s)
+        
+        return df
+    
+    def fiveYearReturnsByYearTable(self):
+        # Gets the historical close prices by input time frame
+        def getHistoricalClosePrices(ticker, time):
+            stockObj = yf.Ticker(ticker).history(time)
+            return stockObj
+        # Gets the returns from dataframe from date: 'start' to 'end'
+        def getReturnForYear(df, start, end):
+            start = start.date()
+            end = end.date()
+            returnForMon = df.loc[start:end]['Returns'].sum()
+            return returnForMon
+        
+        sample_data = getHistoricalClosePrices(self.ticker, '5y')
+        sample_data.index = sample_data.index.date
+        sample_data['Returns'] = sample_data['Close'].pct_change(1)
+        close_returns_df = sample_data
+        # listOfDates = close_returns_df.index
+        # currentYear = dt.datetime.today().year
+        # print(currentYear)
+        start = pd.Timestamp(year=2019, month=1, day=1)
+        df = pd.DataFrame({"Start": pd.date_range(start, periods=5, freq="YS"),
+                            "End": pd.date_range(start, periods=5, freq="Y")})
+
+        print(df)
+        df['Returns'] = 1
+        for k in df.index:
+            # print(df['Start'][k].date(), df['End'][k].date())
+            try:
+                
+                df['Returns'][k] = getReturnForYear(sample_data, df['Start'][k], df['End'][k])
+            except:
+                df['Returns'][k] = 0
+
+        df['Start'] = (df['Start']).apply(lambda s: s.strftime('%m-%d-%Y') if pd.notnull(s) else s)
+        df['End'] = (df['End']).apply(lambda s: s.strftime('%m-%d-%Y') if pd.notnull(s) else s)
+        
+        return df
 
 
 ###################################################################################################################
@@ -226,6 +301,19 @@ class volumeOneYear(Resource):
         volumeDataJson = volumeData.to_dict(orient='index')
         return volumeDataJson
     
+class fiveYearReturnsByMonth(Resource):
+    def get(self, ticker):
+        fiveYearReturnsTable = Equity(ticker).fiveYearReturnsByMonthTable()
+        print(fiveYearReturnsTable)
+        fiveYearReturnsTableJSON = fiveYearReturnsTable.to_dict(orient='index')
+        return fiveYearReturnsTableJSON
+
+class fiveYearReturnsByYear(Resource):
+    def get(self, ticker):
+        fiveYearReturnsTable = Equity(ticker).fiveYearReturnsByYearTable()
+        print(fiveYearReturnsTable)
+        fiveYearReturnsTableJSON = fiveYearReturnsTable.to_dict(orient='index')
+        return fiveYearReturnsTableJSON
 
 ########## MISC CLASSES ##########
     
@@ -332,6 +420,8 @@ api.add_resource(status, '/')
 api.add_resource(YTDreturn, '/Stock/<ticker>/returns/ytd')
 api.add_resource(threeYearReturn, '/Stock/<ticker>/returns/3y')
 api.add_resource(fiveYearReturn, '/Stock/<ticker>/returns/5y')
+api.add_resource(fiveYearReturnsByMonth, '/Stock/<ticker>/returns/monthly/5y')
+api.add_resource(fiveYearReturnsByYear, '/Stock/<ticker>/returns/yearly/5y')
 
 # EQUITY DIVIDEND ENDPOINTS
 api.add_resource(dividends, '/Stock/<ticker>/dividends')
