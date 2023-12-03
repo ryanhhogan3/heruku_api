@@ -184,8 +184,14 @@ class Equity:
         def getReturnForMonth(df, start, end):
             start = start.date()
             end = end.date()
-            returnForMon = df.loc[start:end]['Returns'].sum()
-            return returnForMon
+            closePricesForMonth = df.loc[start:end]
+            monthStart = (closePricesForMonth.iloc[0]['Close'])
+            monthEnd = (closePricesForMonth.iloc[-1]['Close'])
+            returnForMonth = (monthEnd/monthStart-1)
+
+            return returnForMonth*100
+        
+
         
         sample_data = getHistoricalClosePrices(self.ticker, '5y')
         sample_data.index = sample_data.index.date
@@ -207,6 +213,7 @@ class Equity:
                 df['Returns'][k] = getReturnForMonth(sample_data, df['Start'][k], df['End'][k])
             except:
                 df['Returns'][k] = 0
+
         df['Start'] = (df['Start']).apply(lambda s: s.strftime('%m-%d-%Y') if pd.notnull(s) else s)
         df['End'] = (df['End']).apply(lambda s: s.strftime('%m-%d-%Y') if pd.notnull(s) else s)
         
@@ -221,8 +228,11 @@ class Equity:
         def getReturnForYear(df, start, end):
             start = start.date()
             end = end.date()
-            returnForMon = df.loc[start:end]['Returns'].sum()
-            return returnForMon
+            closePricesForYear = df.loc[start:end]
+            monthStart = (closePricesForYear.iloc[0]['Close'])
+            monthEnd = (closePricesForYear.iloc[-1]['Close'])
+            returnForYear = (monthEnd/monthStart-1)
+            return returnForYear
         
         sample_data = getHistoricalClosePrices(self.ticker, '5y')
         sample_data.index = sample_data.index.date
@@ -235,7 +245,6 @@ class Equity:
         df = pd.DataFrame({"Start": pd.date_range(start, periods=5, freq="YS"),
                             "End": pd.date_range(start, periods=5, freq="Y")})
 
-        print(df)
         df['Returns'] = 1
         for k in df.index:
             # print(df['Start'][k].date(), df['End'][k].date())
