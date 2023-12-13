@@ -378,6 +378,12 @@ class LongTermDebtAnnual(Resource):
         LTdebt = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
         return LTdebt
     
+class OperatingIncomeAnnual(Resource):
+    def get(self, ticker):
+        tag = "OperatingIncomeLoss"
+        OperatingIncome = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
+        return OperatingIncome
+    
 
 
 class FreeCashFlowAnnual(Resource):
@@ -462,6 +468,7 @@ api.add_resource(FreeCashFlowAnnual, '/Stock/<ticker>/annual/freecashflow')
 api.add_resource(RevenueAnnual, '/Stock/<ticker>/annual/revenue')
 api.add_resource(DilutedSharesOutstandingAnnual, '/Stock/<ticker>/annual/shares')
 api.add_resource(LongTermDebtAnnual, '/Stock/<ticker>/annual/ltdebt')
+api.add_resource(OperatingIncomeAnnual, '/Stock/<ticker>/annual/operatingIncome')
 
 
 
