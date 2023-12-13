@@ -372,6 +372,12 @@ class CapitalExpenditureAnnual(Resource):
         CapexAnnual = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
         return CapexAnnual
     
+class LongTermDebtAnnual(Resource):
+    def get(self, ticker):
+        tag = "LongTermDebt"
+        LTdebt = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
+        return LTdebt
+    
 
 
 class FreeCashFlowAnnual(Resource):
@@ -455,6 +461,7 @@ api.add_resource(CapitalExpenditureAnnual, '/Stock/<ticker>/annual/capex')
 api.add_resource(FreeCashFlowAnnual, '/Stock/<ticker>/annual/freecashflow')
 api.add_resource(RevenueAnnual, '/Stock/<ticker>/annual/revenue')
 api.add_resource(DilutedSharesOutstandingAnnual, '/Stock/<ticker>/annual/shares')
+api.add_resource(LongTermDebtAnnual, '/Stock/<ticker>/annual/ltdebt')
 
 
 
