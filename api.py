@@ -84,6 +84,9 @@ class Equity:
         except:
             print('Error: Ticker Not Found')
 
+#######################################################################
+######################## SUBMISSION FUNCTIONS #########################
+
 
 
 
@@ -108,13 +111,36 @@ class Equity:
         valuesDF = self.getValueOfTag(tag)
         
         valuesDF = valuesDF.drop(columns='filed')
-        
+        tempVar = valuesDF
+        print(f'Number of records: {len(tempVar.index)}')
 
-        valuesDFannualFilter = valuesDF.where(~valuesDF['fp'].str.contains("Q")).dropna(how='all')
-        valuesDFannualFilter = valuesDFannualFilter.where(~valuesDFannualFilter['frame'].str.contains("Q", na=False)).dropna(how='any')
-        valuesDFannualFilter = valuesDFannualFilter.drop(columns=['accn','form','start','end']).set_index('frame')
+        try: 
+            valuesDFannualFilter = valuesDF.where(~valuesDF['fp'].str.contains("Q")).dropna(how='all')
+            print(f'\nSuccessfully dropped quarters from column FP, now {len(valuesDFannualFilter.index)} records remain.')
+        except:
+            valuesDFannualFilter = tempVar
+            print('Error dropping quarters from dataset')
+
+        try:
+            valuesDFannualFilterNotQ = valuesDFannualFilter.where(~valuesDFannualFilter['frame'].str.contains("Q", na=False)).dropna(how='any')
+            if len(valuesDFannualFilterNotQ.index > 0):
+                valuesDFannualFilter = valuesDFannualFilterNotQ
+            else:
+                valuesDFannualFilter
+            print(f'Successfully dropped frames containing Q, now {len(valuesDFannualFilter.index)} records remain.')
+
+        except:
+            pass
+            print('Error dropping frames that contain Q from dataset')
+        try:
+            valuesDFannualFilter = valuesDFannualFilter.drop(columns=['accn','form','start','end']).set_index('frame')
+            print(f'Successfully dropped the columns, now {len(valuesDFannualFilter.index)} records remain.')
+            
+        except:
+            pass
+            print('Error dropping columns')
+            
         print(valuesDFannualFilter)
-        # valuesJSON = valuesDFannualFilter.to_dict(orient='index')
         return valuesDFannualFilter
 
 
@@ -374,8 +400,8 @@ class CapitalExpenditureAnnual(Resource):
     
 class LongTermDebtAnnual(Resource):
     def get(self, ticker):
-        tag = "LongTermDebt"
-        LTdebt = Equity(ticker).getAnnualValuesOfTag(tag).to_dict(orient='index')
+        tag = "DebtInstrumentCarryingAmount"
+        LTdebt = Equity(ticker).getAnnualValuesOfTag(tag).dropna().to_dict(orient='index')
         return LTdebt
     
 class OperatingIncomeAnnual(Resource):
