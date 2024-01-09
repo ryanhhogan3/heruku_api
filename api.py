@@ -17,6 +17,11 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
+# The workflow of the API is as follows:
+# Functions: scrape, mine, and manipulate the data.
+# Class Objects: prepare the data and convert it to json format
+# API Endpoints: Serve the data on a defined endpoint
+
 
 
 #######################################################################################################################################
